@@ -1,0 +1,15 @@
+services:
+    steevanb.container_introspection:
+        class: steevanb\ContainerIntrospection\ContainerIntrospectionService
+        arguments: ['@service_container']
+        public: true
+
+    steevanb.container_introspection_data_collector:
+        class: steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DataCollector\ContainerIntrospectionCollector
+        arguments: ['@steevanb.container_introspection']
+        tags:
+            -
+                name: data_collector
+                template: 'ContainerIntrospectionBundle:DataCollector:container.html.twig'
+                id: steevanb.container_collector
+        public: false

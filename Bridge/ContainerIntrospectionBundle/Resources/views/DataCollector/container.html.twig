@@ -1,0 +1,274 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ include('@ContainerIntrospection/DataCollector/container.svg') }}
+        <span class="sf-toolbar-value">{{ collector.countInstantiatedServices()|localizednumber }} / {{ collector.countRegisteredServices()|localizednumber }}</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Instantiated services</b>
+            <span>{{ collector.countInstantiatedServices()|localizednumber }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Registered services</b>
+            <span>{{ collector.countRegisteredServices()|localizednumber }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Public services</b>
+            <span>{{ collector.countPublicServices()|localizednumber }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Private services</b>
+            <span>{{ collector.countPrivateServices()|localizednumber }}</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>Parameters</b>
+            <span>{{ collector.countParameters()|localizednumber }}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig') }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">{{ include('@ContainerIntrospection/DataCollector/container.svg') }}</span>
+        <strong>Container introspec.</strong>
+    </span>
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+    <style type="text/css">
+        body {
+            cursor: default;
+        }
+
+        .highlight {
+            background-color: #F5F5F5;
+        }
+
+        .variable-name {
+            color: #8959A8;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block panel %}
+    <h2>Statistics</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value" title="{{ collector.getContainerCachePath() }}">{{ collector.getContainerCacheDir() }}</span>
+            <span class="label">Cache dir</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.countContainerCacheFiles() }}</span>
+            <span class="label">Cache files</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.countContainerCacheLines()|number_format(0, '.', ',') }}</span>
+            <span class="label">Cache lines</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ (collector.getContainerCacheSize() / 1024 / 1024)|number_format(2, '.', ',') }} Mo</span>
+            <span class="label">Cache size</span>
+        </div>
+    </div>
+
+    <h2>Introspection</h2>
+
+    <div class="sf-tabs">
+        <div class="tab">
+            <h3 class="tab-title">
+                Instantiated services
+                <span class="badge">{{ collector.countInstantiatedServices()|localizednumber }}</span>
+            </h3>
+
+            <p class="text-muted">
+                Note that only shared services are shown here,
+                we can't handle <a href="https://symfony.com/doc/current/service_container/shared.html" target="_blank">non shared service</a> creation.
+            </p>
+
+            <div class="tab-content">
+                <table class="table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Service Id</th>
+                            <th>FQCN</th>
+                            <th>Instantiation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for serviceId, serviceInfos in collector.getInstantiatedServices() %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    {{ serviceId }}
+
+                                    <br>
+                                    {% if serviceInfos.dependencies|length > 0 %}
+                                        <a
+                                            href="#"
+                                            class="sf-toggle text-small font-normal link-inverse"
+                                            data-toggle-selector="#container-introspection-dependencies-{{ loop.index0 }}"
+                                            data-toggle-alt-content="Hide dependencies"
+                                        >View dependencies</a>
+                                    {% else %}
+                                        <i class="text-small font-normal">No dependencies</i>
+                                    {% endif %}
+
+                                    <a
+                                        href="#"
+                                        class="sf-toggle text-small font-normal link-inverse"
+                                        data-toggle-selector="#container-introspection-fileName-{{ loop.index0 }}"
+                                        data-toggle-alt-content="Hide file name"
+                                    >View file name</a>
+
+                                    <div id="container-introspection-dependencies-{{ loop.index0 }}" class="sf-toggle-content hidden highlight">
+                                        <ul>
+                                            {% for dependency in serviceInfos.dependencies %}
+                                                <li>
+                                                    <i>{{ dependency['type'] }}</i>
+                                                    <span class="variable-name">${{ dependency['name'] }}</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+
+                                    <div id="container-introspection-fileName-{{ loop.index0 }}" class="sf-toggle-content hidden highlight">
+                                        {{ serviceInfos.fileName }}
+                                    </div>
+                                </td>
+                                <td>{{ serviceInfos.fqcn }}</td>
+                                <td>
+                                    {% if serviceInfos.ocramiusLazy %}
+                                        <span class="label status-warning">Ocramius Lazy</span>
+                                    {% else %}
+                                        <span class="label status-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">
+                Registered services
+                <span class="badge">{{ collector.countRegisteredServices()|localizednumber }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Service ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in collector.getRegisteredServices() %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ service }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">
+                Public services
+                <span class="badge">{{ collector.countPublicServices()|localizednumber }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Service ID</th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                        {% for service in collector.getPublicServices() %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ service }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">
+                Private services
+                <span class="badge">{{ collector.countPrivateServices()|localizednumber }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Service ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in collector.getPrivateServices() %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ service }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title">
+                Parameters
+                <span class="badge">{{ collector.countParameters()|localizednumber }}</span>
+            </h3>
+
+            <div class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Parameter name</th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                        {% for parameterName, parameterValue in collector.getParameters() %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ parameterName }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

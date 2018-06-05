@@ -1,10 +1,10 @@
 {
-    "name": "steevanb/symfony-container-profiler",
+    "name": "steevanb/symfony-container-introspection",
     "license": "MIT",
     "type": "lib",
     "description": "Get all Symfony Container informations you need: registered services, instanciated services etc",
     "autoload": {
-        "psr-4": { "steevanb\\ContainerProfiler\\": "" }
+        "psr-4": { "steevanb\\ContainerIntrospection\\": "" }
     },
     "require": {
         "php": "^7.1",
@@ -13,7 +13,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/steevanb/symfony-container-profiler.git"
+            "url": "https://github.com/steevanb/symfony-container-introspection.git"
         }
     ]
 }
