@@ -24,7 +24,7 @@ Installation
 ============
 
 ```bash
-composer require steevanb/symfony-container-introspection ^1.0
+composer require --dev steevanb/symfony-container-introspection ^1.0
 ```
 
 If you use Symfony (and not just symfony/dependency-injection), you can add `ContainerIntrospectionBundle` to your Kernel:
