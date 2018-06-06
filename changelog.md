@@ -1,3 +1,7 @@
+### [1.0.1](../../../compare/1.0.0...1.0.1) - 2018-06-06
+
+- Fix when service is not an object
+
 ### 1.0.0 - 2018-06-06
 
 - Get registered services: `ContainerIntrospectionService::getRegisteredServices()`

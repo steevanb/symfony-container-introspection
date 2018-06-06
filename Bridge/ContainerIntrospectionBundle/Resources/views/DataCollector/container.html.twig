@@ -130,12 +130,16 @@
                                         <i class="text-small font-normal">No dependencies</i>
                                     {% endif %}
 
-                                    <a
-                                        href="#"
-                                        class="sf-toggle text-small font-normal link-inverse"
-                                        data-toggle-selector="#container-introspection-fileName-{{ loop.index0 }}"
-                                        data-toggle-alt-content="Hide file name"
-                                    >View file name</a>
+                                    {% if serviceInfos.fileName is not null %}
+                                        <a
+                                            href="#"
+                                            class="sf-toggle text-small font-normal link-inverse"
+                                            data-toggle-selector="#container-introspection-fileName-{{ loop.index0 }}"
+                                            data-toggle-alt-content="Hide file name"
+                                        >View file name</a>
+                                    {% else %}
+                                        <i class="text-small font-normal">No file name</i>
+                                    {% endif %}
 
                                     <div id="container-introspection-dependencies-{{ loop.index0 }}" class="sf-toggle-content hidden highlight">
                                         <ul>
@@ -152,7 +156,16 @@
                                         {{ serviceInfos.fileName }}
                                     </div>
                                 </td>
-                                <td>{{ serviceInfos.fqcn }}</td>
+                                <td>
+                                    {% if serviceInfos.fqcn is not null %}
+                                        {{ serviceInfos.fqcn }}
+                                    {% elseif serviceInfos.value is not null %}
+                                        <i>Not an object: </i>
+                                        {{ serviceInfos.value|raw }}
+                                    {% else %}
+                                        <i>Unknown value</i>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% if serviceInfos.ocramiusLazy %}
                                         <span class="label status-warning">Ocramius Lazy</span>

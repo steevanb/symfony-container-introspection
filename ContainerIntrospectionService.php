@@ -57,26 +57,40 @@ class ContainerIntrospectionService
         $return = [];
         foreach ($services as $id) {
             $service = $this->container->get($id);
-            $ocramiusLazy = $service instanceof VirtualProxyInterface;
-            $className = ($ocramiusLazy) ? get_parent_class($service) : get_class($service);
 
-            $reflection = new \ReflectionClass($className);
-            $constructor = $reflection->getConstructor();
-            $dependencies = [];
-            if ($constructor instanceof \ReflectionMethod) {
-                foreach ($constructor->getParameters() as $parameter) {
-                    $dependencies[] = [
-                        'type' => $parameter->getType() instanceof \ReflectionNamedType
-                            ? $parameter->getType()->getName()
-                            : null,
-                        'name' => $parameter->getName()
-                    ];
+            if (is_object($service)) {
+                $ocramiusLazy = $service instanceof VirtualProxyInterface;
+                $className = ($ocramiusLazy) ? get_parent_class($service) : get_class($service);
+
+                $reflection = new \ReflectionClass($className);
+                $constructor = $reflection->getConstructor();
+                $dependencies = [];
+                if ($constructor instanceof \ReflectionMethod) {
+                    foreach ($constructor->getParameters() as $parameter) {
+                        $dependencies[] = [
+                            'type' => $parameter->getType() instanceof \ReflectionNamedType
+                                ? $parameter->getType()->getName()
+                                : null,
+                            'name' => $parameter->getName()
+                        ];
+                    }
                 }
+
+                $value = null;
+                $fqcn = $reflection->getName();
+                $fileName = $reflection->getFileName();
+            } else {
+                $value = var_export($service, true);
+                $fqcn = null;
+                $fileName = null;
+                $dependencies = [];
+                $ocramiusLazy = false;
             }
 
             $return[$id] = [
-                'fqcn' => $reflection->getName(),
-                'fileName' => $reflection->getFileName(),
+                'value' => $value,
+                'fqcn' => $fqcn,
+                'fileName' => $fileName,
                 'dependencies' => $dependencies,
                 'ocramiusLazy' => $ocramiusLazy
             ];
