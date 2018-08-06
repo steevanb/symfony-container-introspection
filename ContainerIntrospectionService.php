@@ -51,13 +51,11 @@ class ContainerIntrospectionService
 
     public function getInstantiatedServices(): array
     {
-        $services = array_keys($this->getPrivatePropertyValue('services'));
-        sort($services);
+        $services = $this->getPrivatePropertyValue('services');
+        ksort($services);
 
         $return = [];
-        foreach ($services as $id) {
-            $service = $this->container->get($id);
-
+        foreach ($services as $id => $service) {
             if (is_object($service)) {
                 $ocramiusLazy = $service instanceof VirtualProxyInterface;
                 $className = ($ocramiusLazy) ? get_parent_class($service) : get_class($service);
@@ -101,7 +99,7 @@ class ContainerIntrospectionService
 
     public function countInstantiatedServices(): int
     {
-        return count($this->getInstantiatedServices());
+        return count($this->getPrivatePropertyValue('services'));
     }
 
     public function getPrivateServices(): array
