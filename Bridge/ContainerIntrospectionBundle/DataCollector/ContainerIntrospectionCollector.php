@@ -28,6 +28,8 @@ class ContainerIntrospectionCollector extends DataCollector
 
     public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
+        $this->introspection->introspect();
+
         $this->data = [
             'containerCachePath' => $this->introspection->getContainerCachePath(),
             'containerCacheDir' => $this->introspection->getContainerCacheDir(),
@@ -35,8 +37,7 @@ class ContainerIntrospectionCollector extends DataCollector
             'countContainerCacheLines' => $this->introspection->countContainerCacheLines(),
             'containerCacheSize' => $this->introspection->getContainerCacheSize(),
 
-            'registeredServices' => $this->introspection->getRegisteredServices(),
-            'countRegisteredServices' => $this->introspection->countRegisteredServices(),
+            'countServices' => $this->introspection->countServices(),
 
             'instantiatedServices' => $this->introspection->getInstantiatedServices(),
             'countInstanciatedServices' => $this->introspection->countInstantiatedServices(),
@@ -44,8 +45,8 @@ class ContainerIntrospectionCollector extends DataCollector
             'publicServices' => $this->introspection->getPublicServices(),
             'countPublicServices' => $this->introspection->countPublicServices(),
 
-            'privateServices' => $this->introspection->getPrivateServices(),
-            'countPrivateServices' => $this->introspection->countPrivateServices(),
+            'removedServices' => $this->introspection->getRemovedServices(),
+            'countRemovedServices' => $this->introspection->countRemovedServices(),
 
             'parameters' => $this->introspection->getParameters(),
             'countParameters' => $this->introspection->countParameters()
@@ -82,16 +83,6 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['containerCacheSize'];
     }
 
-    public function getRegisteredServices(): array
-    {
-        return $this->data['registeredServices'];
-    }
-
-    public function countRegisteredServices(): int
-    {
-        return $this->data['countRegisteredServices'];
-    }
-
     public function getInstantiatedServices(): array
     {
         return $this->data['instantiatedServices'];
@@ -112,14 +103,14 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['countPublicServices'];
     }
 
-    public function getPrivateServices(): array
+    public function getRemovedServices(): array
     {
-        return $this->data['privateServices'];
+        return $this->data['removedServices'];
     }
 
-    public function countPrivateServices(): int
+    public function countRemovedServices(): int
     {
-        return $this->data['countPrivateServices'];
+        return $this->data['countRemovedServices'];
     }
 
     public function getParameters(): array
@@ -130,5 +121,22 @@ class ContainerIntrospectionCollector extends DataCollector
     public function countParameters(): int
     {
         return $this->data['countParameters'];
+    }
+
+    public function countServices(): int
+    {
+        return $this->data['countServices'];
+    }
+
+    public function getInstantiatedInfos(string $id): ?array
+    {
+        $services = $this->getInstantiatedServices();
+
+        return array_key_exists($id, $services) ? $services[$id] : null;
+    }
+
+    public function dumpParameterValue($data): void
+    {
+        echo var_export($data, true);
     }
 }

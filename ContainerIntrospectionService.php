@@ -12,11 +12,12 @@ declare(strict_types=1);
 namespace steevanb\ContainerIntrospection;
 
 use ProxyManager\Proxy\VirtualProxyInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class ContainerIntrospectionService
 {
-    /** @var ContainerInterface */
+    /** @var Container */
     protected $container;
 
     /** @var string */
@@ -25,125 +26,99 @@ class ContainerIntrospectionService
     /** @var string */
     protected $cacheDir;
 
-    /** Yes, Container as dependency, cause we need to use \ReflectionClass on it to find services */
-    public function __construct(ContainerInterface $container)
+    /** @var string[] */
+    protected $instanciatedServices = [];
+
+    /** @var string[] */
+    protected $publicServices = [];
+
+    /** @var string[] */
+    protected $privateServices = [];
+
+    /** @var string[] */
+    protected $removedServices = [];
+
+    protected $parameters = [];
+
+    /** @var ?string */
+    protected $cachePath;
+
+    /** @var ?int */
+    protected $cacheFilesCount;
+
+    /** @var ?int */
+    protected $cacheLinesCount;
+
+    /** @var ?int */
+    protected $cacheSize;
+
+    /** @var ?int */
+    protected $countServices;
+
+    /** Yes, Container as dependency, cause we need to use \ReflectionClass and call getRemovedIds() on it to find services */
+    public function __construct(Container $container)
     {
         $this->container = $container;
         $this->containerClassName = get_class($container);
         $this->cacheDir = $container->getParameter('kernel.cache_dir');
     }
 
-    public function getRegisteredServices(): array
+    public function introspect(): self
     {
-        $fileMapServices = array_keys($this->getPrivatePropertyValue('fileMap'));
-        $methodMapServices = array_keys($this->getPrivatePropertyValue('methodMap'));
+        $this
+            ->introspectInstantiatedServices()
+            ->introspectPublicServices()
+            ->introspectRemovedServices()
+            ->introspectParameters()
+            ->introspectCountServices()
+            ->introspectCache();
 
-        $return = array_merge($fileMapServices, $methodMapServices);
-        sort($return);
-
-        return $return;
-    }
-
-    public function countRegisteredServices(): int
-    {
-        return count($this->getRegisteredServices());
+        return $this;
     }
 
     public function getInstantiatedServices(): array
     {
-        $services = $this->getPrivatePropertyValue('services');
-        ksort($services);
-
-        $return = [];
-        foreach ($services as $id => $service) {
-            if (is_object($service)) {
-                $ocramiusLazy = $service instanceof VirtualProxyInterface;
-                $className = ($ocramiusLazy) ? get_parent_class($service) : get_class($service);
-
-                $reflection = new \ReflectionClass($className);
-                $constructor = $reflection->getConstructor();
-                $dependencies = [];
-                if ($constructor instanceof \ReflectionMethod) {
-                    foreach ($constructor->getParameters() as $parameter) {
-                        $dependencies[] = [
-                            'type' => $parameter->getType() instanceof \ReflectionNamedType
-                                ? $parameter->getType()->getName()
-                                : null,
-                            'name' => $parameter->getName()
-                        ];
-                    }
-                }
-
-                $value = null;
-                $fqcn = $reflection->getName();
-                $fileName = $reflection->getFileName();
-            } else {
-                $value = var_export($service, true);
-                $fqcn = null;
-                $fileName = null;
-                $dependencies = [];
-                $ocramiusLazy = false;
-            }
-
-            $return[$id] = [
-                'value' => $value,
-                'fqcn' => $fqcn,
-                'fileName' => $fileName,
-                'dependencies' => $dependencies,
-                'ocramiusLazy' => $ocramiusLazy
-            ];
-        }
-
-        return $return;
+        return $this->instanciatedServices;
     }
 
     public function countInstantiatedServices(): int
     {
-        return count($this->getPrivatePropertyValue('services'));
+        return count($this->instanciatedServices);
     }
 
-    public function getPrivateServices(): array
+    public function getRemovedServices(): array
     {
-        $return = array_keys($this->getPrivatePropertyValue('privates'));
-        sort($return);
-
-        return $return;
+        return $this->removedServices;
     }
 
-    public function countPrivateServices(): int
+    public function countRemovedServices(): int
     {
-        return count($this->getPrivatePropertyValue('privates'));
+        return count($this->removedServices);
     }
 
     public function getPublicServices(): array
     {
-        $registeredServices = $this->getRegisteredServices();
-        $privateServices = $this->getPrivateServices();
-
-        return array_diff($registeredServices, $privateServices);
+        return $this->publicServices;
     }
 
     public function countPublicServices(): int
     {
-        return $this->countRegisteredServices() - $this->countPrivateServices();
+        return count($this->publicServices);
     }
 
     public function getParameters(): array
     {
-        return $this->getPrivatePropertyValue('parameters');
+        return $this->parameters;
     }
 
     public function countParameters(): int
     {
-        return count($this->getParameters());
+        return count($this->parameters);
     }
 
     public function getContainerCachePath(): string
     {
-        return dirname(
-            (new \ReflectionClass($this->getContainerCacheClassName()))
-                ->getFileName()
-        );
+        return $this->cachePath;
     }
 
     public function getContainerCacheDir(): string
@@ -153,27 +128,22 @@ class ContainerIntrospectionService
 
     public function countContainerCacheFiles(): int
     {
-        return count(glob($this->getContainerCachePath() . '/*'));
+        return $this->cacheFilesCount;
     }
 
     public function countContainerCacheLines(): int
     {
-        $return = 0;
-        foreach (glob($this->getContainerCachePath() . '/*') as $cacheFile) {
-            $return += count(file(($cacheFile)));
-        }
-
-        return $return;
+        return $this->cacheLinesCount;
     }
 
     public function getContainerCacheSize(): int
     {
-        $return = 0;
-        foreach (glob($this->getContainerCachePath() . '/*') as $cacheFile) {
-            $return += filesize($cacheFile);
-        }
+        return $this->cacheSize;
+    }
 
-        return $return;
+    public function countServices(): int
+    {
+        return $this->countServices;
     }
 
     protected function getPrivatePropertyValue(string $name)
@@ -205,5 +175,134 @@ class ContainerIntrospectionService
         }
 
         return $reflection->getName();
+    }
+
+    protected function introspectInstantiatedServices(): self
+    {
+        $services = array_merge(
+            $this->getPrivatePropertyValue('services'),
+            $this->getPrivatePropertyValue('privates')
+        );
+        ksort($services);
+
+        foreach ($services as $id => $service) {
+            if (is_object($service)) {
+                $ocramiusLazy = $service instanceof VirtualProxyInterface;
+                $className = ($ocramiusLazy) ? get_parent_class($service) : get_class($service);
+
+                $reflection = new \ReflectionClass($className);
+                $constructor = $reflection->getConstructor();
+                $dependencies = [];
+                if ($constructor instanceof \ReflectionMethod) {
+                    foreach ($constructor->getParameters() as $parameter) {
+                        $dependencies[] = [
+                            'type' => $parameter->getType() instanceof \ReflectionNamedType
+                                ? $parameter->getType()->getName()
+                                : null,
+                            'name' => $parameter->getName()
+                        ];
+                    }
+                }
+
+                $value = null;
+                $fqcn = $reflection->getName();
+                $fileName = $reflection->getFileName();
+            } else {
+                $value = var_export($service, true);
+                $fqcn = null;
+                $fileName = null;
+                $dependencies = [];
+                $ocramiusLazy = false;
+            }
+
+            try {
+                $this->container->get($id);
+                $public = true;
+            } catch (ServiceNotFoundException $e) {
+                $public = false;
+            }
+
+            $this->instanciatedServices[$id] = [
+                'value' => $value,
+                'public' => $public,
+                'fqcn' => $fqcn,
+                'fileName' => $fileName,
+                'dependencies' => $dependencies,
+                'ocramiusLazy' => $ocramiusLazy
+            ];
+        }
+
+        return $this;
+    }
+
+    protected function introspectRemovedServices(): self
+    {
+        $this->removedServices = array_keys($this->container->getRemovedIds());
+        sort($this->removedServices);
+
+        return $this;
+    }
+
+    protected function introspectPublicServices(): self
+    {
+        $fileMapServices = array_keys($this->getPrivatePropertyValue('fileMap'));
+        $methodMapServices = array_keys($this->getPrivatePropertyValue('methodMap'));
+        $removedServices = array_keys($this->container->getRemovedIds());
+        $privateServices = array_keys($this->getPrivatePropertyValue('privates'));
+        $services = array_keys($this->getPrivatePropertyValue('services'));
+
+        $this->publicServices = array_flip(array_unique(array_merge($fileMapServices, $methodMapServices, $services)));
+
+        // look likes fileMap and methodMap only registers public services, but i filter them to be sure
+        foreach (array_merge($privateServices, $removedServices) as $privateServiceId) {
+            unset($this->publicServices[$privateServiceId]);
+        }
+        $this->publicServices = array_flip($this->publicServices);
+        sort($this->publicServices);
+
+        return $this;
+    }
+
+    protected function introspectParameters(): self
+    {
+        $this->parameters = $this->getPrivatePropertyValue('parameters');
+
+        return $this;
+    }
+
+    protected function introspectCache(): self
+    {
+        $this->cachePath = dirname(
+            (new \ReflectionClass($this->getContainerCacheClassName()))
+                ->getFileName()
+        );
+
+        $this->cacheFilesCount = count(glob($this->getContainerCachePath() . '/*'));
+
+        $this->cacheLinesCount = 0;
+        $this->cacheSize = 0;
+        foreach (glob($this->getContainerCachePath() . '/*') as $cacheFile) {
+            $this->cacheLinesCount += count(file(($cacheFile)));
+            $this->cacheSize += filesize($cacheFile);
+        }
+
+        return $this;
+    }
+
+    protected function introspectCountServices(): self
+    {
+        $this->countServices = count(
+            array_unique(
+                array_merge(
+                    array_keys($this->getPrivatePropertyValue('fileMap')),
+                    array_keys($this->getPrivatePropertyValue('methodMap')),
+                    array_keys($this->container->getRemovedIds()),
+                    array_keys($this->getPrivatePropertyValue('privates')),
+                    array_keys($this->getPrivatePropertyValue('services'))
+                )
+            )
+        );
+
+        return $this;
     }
 }

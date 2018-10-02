@@ -1,3 +1,7 @@
+### [1.1.0](../../compare/1.0.2...1.1.0) - 2018-09-02
+
+- Compatibility with symfony/dependency-injection ^4.0, remove symfony/dependency-injection ^3.4 compatibility
+
 ### [1.0.2](../../compare/1.0.1...1.0.2) - 2018-08-06
 
 - Do not call `ContainerInterface::get()` to retrieve informations on service, we already got it. It remove deprecated for private services in Symfony 3, and retrieve private service informations in Symfony 4.

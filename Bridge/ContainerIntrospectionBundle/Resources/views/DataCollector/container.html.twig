@@ -1,35 +1,48 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
+{% macro serviceInstantiation(infos) %}
+    {% if infos is null %}
+        Not instantiated
+    {% elseif infos.ocramiusLazy %}
+        <span class="label status-warning">Ocramius Lazy</span>
+    {% else %}
+        <span class="label status-success">Normal</span>
+    {% endif %}
+{% endmacro %}
+
 {% block toolbar %}
     {% set icon %}
         {{ include('@ContainerIntrospection/DataCollector/container.svg') }}
-        <span class="sf-toolbar-value">{{ collector.countInstantiatedServices()|localizednumber }} / {{ collector.countRegisteredServices()|localizednumber }}</span>
+        <span class="sf-toolbar-value">
+            {{ collector.countInstantiatedServices()|number_format(0, '.', ',') }}
+            / {{ collector.countServices()|number_format(0, '.', ',') }}
+        </span>
     {% endset %}
 
     {% set text %}
         <div class="sf-toolbar-info-piece">
-            <b>Instantiated services</b>
-            <span>{{ collector.countInstantiatedServices()|localizednumber }}</span>
+            <b>Instantiated</b>
+            <span>{{ collector.countInstantiatedServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
-            <b>Registered services</b>
-            <span>{{ collector.countRegisteredServices()|localizednumber }}</span>
+            <b>Removed</b>
+            <span>{{ collector.countRemovedServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
-            <b>Public services</b>
-            <span>{{ collector.countPublicServices()|localizednumber }}</span>
+            <b>Public</b>
+            <span>{{ collector.countPublicServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
-            <b>Private services</b>
-            <span>{{ collector.countPrivateServices()|localizednumber }}</span>
+            <b>Total</b>
+            <span>{{ collector.countServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
             <b>Parameters</b>
-            <span>{{ collector.countParameters()|localizednumber }}</span>
+            <span>{{ collector.countParameters()|number_format(0, '.', ',') }}</span>
         </div>
     {% endset %}
 
@@ -59,20 +72,39 @@
             color: #8959A8;
             font-weight: bold;
         }
+
+        .label.visibility-public {
+            background: #269cce;
+            color: #FFF;
+        }
+
+        .label.visibility-private {
+            background: #666666;
+            color: #FFF;
+        }
     </style>
 {% endblock %}
 
 {% block panel %}
+    {% import _self as self %}
+
     <h2>Statistics</h2>
 
     <div class="metrics">
         <div class="metric">
             <span class="value" title="{{ collector.getContainerCachePath() }}">{{ collector.getContainerCacheDir() }}</span>
-            <span class="label">Cache dir</span>
+            <span class="label">Container</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ collector.countContainerCacheFiles() }}</span>
+            <span class="value" title="{{ collector.countServices()|number_format(0, '.', ',') }}">
+                {{ collector.countServices()|number_format(0, '.', ',') }}
+            </span>
+            <span class="label">Services</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.countContainerCacheFiles()|number_format(0, '.', ',') }}</span>
             <span class="label">Cache files</span>
         </div>
 
@@ -92,12 +124,12 @@
     <div class="sf-tabs">
         <div class="tab">
             <h3 class="tab-title">
-                Instantiated services
-                <span class="badge">{{ collector.countInstantiatedServices()|localizednumber }}</span>
+                Instantiated
+                <span class="badge">{{ collector.countInstantiatedServices()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <p class="text-muted">
-                Note that only shared services are shown here,
+                Note that only shared (singleton) services are shown here,
                 we can't handle <a href="https://symfony.com/doc/current/service_container/shared.html" target="_blank">non shared service</a> creation.
             </p>
 
@@ -105,8 +137,8 @@
                 <table class="table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Service Id</th>
+                            <th>Visibility</th>
+                            <th>Service id</th>
                             <th>FQCN</th>
                             <th>Instantiation</th>
                         </tr>
@@ -114,7 +146,13 @@
                     <tbody>
                         {% for serviceId, serviceInfos in collector.getInstantiatedServices() %}
                             <tr>
-                                <td>{{ loop.index }}</td>
+                                <td>
+                                    {% if serviceInfos.public %}
+                                        <span class="label visibility-public">Public</span>
+                                    {% else %}
+                                        <span class="label visibility-private">Private</span>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {{ serviceId }}
 
@@ -166,13 +204,7 @@
                                         <i>Unknown value</i>
                                     {% endif %}
                                 </td>
-                                <td>
-                                    {% if serviceInfos.ocramiusLazy %}
-                                        <span class="label status-warning">Ocramius Lazy</span>
-                                    {% else %}
-                                        <span class="label status-success">Normal</span>
-                                    {% endif %}
-                                </td>
+                                <td>{{ self.serviceInstantiation(serviceInfos) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -182,22 +214,24 @@
 
         <div class="tab">
             <h3 class="tab-title">
-                Registered services
-                <span class="badge">{{ collector.countRegisteredServices()|localizednumber }}</span>
+                Removed
+                <span class="badge">{{ collector.countRemovedServices()|number_format(0, '.', ',') }}</span>
             </h3>
+
+            <p class="text-muted">
+                Some privates, all inlined and all tagged services are removed from Container.
+            </p>
 
             <div class="tab-content">
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Service ID</th>
+                            <th>Service id</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for service in collector.getRegisteredServices() %}
+                        {% for service in collector.getRemovedServices() %}
                             <tr>
-                                <td>{{ loop.index }}</td>
                                 <td>{{ service }}</td>
                             </tr>
                         {% endfor %}
@@ -208,49 +242,23 @@
 
         <div class="tab">
             <h3 class="tab-title">
-                Public services
-                <span class="badge">{{ collector.countPublicServices()|localizednumber }}</span>
+                Public
+                <span class="badge">{{ collector.countPublicServices()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <div class="tab-content">
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Service ID</th>
+                            <th>Service id</th>
+                            <th>Instantiated</th>
                         </tr>
                     </thead>
-                        <tbody>
+                    <tbody>
                         {% for service in collector.getPublicServices() %}
                             <tr>
-                                <td>{{ loop.index }}</td>
                                 <td>{{ service }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="tab">
-            <h3 class="tab-title">
-                Private services
-                <span class="badge">{{ collector.countPrivateServices()|localizednumber }}</span>
-            </h3>
-
-            <div class="tab-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Service ID</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for service in collector.getPrivateServices() %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>{{ service }}</td>
+                                <td>{{ self.serviceInstantiation(collector.getInstantiatedInfos(service)) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -261,22 +269,22 @@
         <div class="tab">
             <h3 class="tab-title">
                 Parameters
-                <span class="badge">{{ collector.countParameters()|localizednumber }}</span>
+                <span class="badge">{{ collector.countParameters()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <div class="tab-content">
                 <table>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Parameter name</th>
+                            <th>Name</th>
+                            <th>Value</th>
                         </tr>
                     </thead>
-                        <tbody>
+                    <tbody>
                         {% for parameterName, parameterValue in collector.getParameters() %}
                             <tr>
-                                <td>{{ loop.index }}</td>
                                 <td>{{ parameterName }}</td>
+                                <td>{{ collector.dumpParameterValue(parameterValue) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
