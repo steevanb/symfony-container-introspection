@@ -10,6 +10,6 @@ services:
         tags:
             -
                 name: data_collector
-                template: 'ContainerIntrospectionBundle:DataCollector:container.html.twig'
+                template: '@ContainerIntrospection/DataCollector/container.html.twig'
                 id: steevanb.container_collector
         public: false

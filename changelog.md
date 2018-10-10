@@ -1,3 +1,7 @@
+### [1.1.1](../../compare/1.1.0...1.1.1) - 2018-09-10
+
+- Fix Symfony4 bundle DataCollector template name when not using LiipThemeBundle
+
 ### [1.1.0](../../compare/1.0.2...1.1.0) - 2018-09-02
 
 - Compatibility with symfony/dependency-injection ^4.0, remove symfony/dependency-injection ^3.4 compatibility
