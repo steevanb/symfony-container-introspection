@@ -20,7 +20,7 @@ With Symfony, a new profiler tab will appear:
 
 [Changelog](changelog.md)
 
-If you want to use it with symfony/dependency-injection ^3.4, use [steevanb/symfony-container-introspection ^1.0](https://github.com/steevanb/symfony-container-introspection/tree/1.0.2).
+If you want to use it with `symfony/dependency-injection ^3.4`, use [steevanb/symfony-container-introspection ^1.0](https://github.com/steevanb/symfony-container-introspection/tree/1.0.x).
 
 Installation
 ============
