@@ -3,33 +3,33 @@
 {% block toolbar %}
     {% set icon %}
         {{ include('@ContainerIntrospection/DataCollector/container.svg') }}
-        <span class="sf-toolbar-value">{{ collector.countInstantiatedServices()|localizednumber }} / {{ collector.countRegisteredServices()|localizednumber }}</span>
+        <span class="sf-toolbar-value">{{ collector.countInstantiatedServices()|number_format(0, '.', ',') }} / {{ collector.countRegisteredServices()|number_format(0, '.', ',') }}</span>
     {% endset %}
 
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Instantiated services</b>
-            <span>{{ collector.countInstantiatedServices()|localizednumber }}</span>
+            <span>{{ collector.countInstantiatedServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
             <b>Registered services</b>
-            <span>{{ collector.countRegisteredServices()|localizednumber }}</span>
+            <span>{{ collector.countRegisteredServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
             <b>Public services</b>
-            <span>{{ collector.countPublicServices()|localizednumber }}</span>
+            <span>{{ collector.countPublicServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
             <b>Private services</b>
-            <span>{{ collector.countPrivateServices()|localizednumber }}</span>
+            <span>{{ collector.countPrivateServices()|number_format(0, '.', ',') }}</span>
         </div>
 
         <div class="sf-toolbar-info-piece">
             <b>Parameters</b>
-            <span>{{ collector.countParameters()|localizednumber }}</span>
+            <span>{{ collector.countParameters()|number_format(0, '.', ',') }}</span>
         </div>
     {% endset %}
 
@@ -93,7 +93,7 @@
         <div class="tab">
             <h3 class="tab-title">
                 Instantiated services
-                <span class="badge">{{ collector.countInstantiatedServices()|localizednumber }}</span>
+                <span class="badge">{{ collector.countInstantiatedServices()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <p class="text-muted">
@@ -183,7 +183,7 @@
         <div class="tab">
             <h3 class="tab-title">
                 Registered services
-                <span class="badge">{{ collector.countRegisteredServices()|localizednumber }}</span>
+                <span class="badge">{{ collector.countRegisteredServices()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <div class="tab-content">
@@ -209,7 +209,7 @@
         <div class="tab">
             <h3 class="tab-title">
                 Public services
-                <span class="badge">{{ collector.countPublicServices()|localizednumber }}</span>
+                <span class="badge">{{ collector.countPublicServices()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <div class="tab-content">
@@ -235,7 +235,7 @@
         <div class="tab">
             <h3 class="tab-title">
                 Private services
-                <span class="badge">{{ collector.countPrivateServices()|localizednumber }}</span>
+                <span class="badge">{{ collector.countPrivateServices()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <div class="tab-content">
@@ -261,7 +261,7 @@
         <div class="tab">
             <h3 class="tab-title">
                 Parameters
-                <span class="badge">{{ collector.countParameters()|localizednumber }}</span>
+                <span class="badge">{{ collector.countParameters()|number_format(0, '.', ',') }}</span>
             </h3>
 
             <div class="tab-content">
