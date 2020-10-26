@@ -1,3 +1,7 @@
+### [2.0.0](../../compare/1.1.1...2.0.0) - 2020-10-26
+
+- Modifications for Symfony 5
+
 ### [1.1.1](../../compare/1.1.0...1.1.1) - 2018-09-10
 
 - Fix Symfony4 bundle DataCollector template name when not using LiipThemeBundle
