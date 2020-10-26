@@ -8,12 +8,6 @@
     },
     "require": {
         "php": "^7.1",
-        "symfony/dependency-injection": "^4.0"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/steevanb/symfony-container-introspection.git"
-        }
-    ]
+        "symfony/dependency-injection": "^5.0"
+    }
 }

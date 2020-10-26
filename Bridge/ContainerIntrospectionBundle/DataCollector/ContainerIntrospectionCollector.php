@@ -26,7 +26,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return 'steevanb.container_collector';
     }
 
-    public function collect(Request $request, Response $response, \Exception $exception = null): void
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->introspection->introspect();
 
@@ -87,7 +87,7 @@ class ContainerIntrospectionCollector extends DataCollector
     {
         return $this->data['instantiatedServices'];
     }
-    
+
     public function countInstantiatedServices(): int
     {
         return $this->data['countInstanciatedServices'];
