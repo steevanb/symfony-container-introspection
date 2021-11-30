@@ -5,8 +5,9 @@ set -eu
 readonly ROOT_DIR="$(realpath "$(dirname "$(realpath "$0")")/../..")"
 source "${ROOT_DIR}"/config/docker.inc.bash
 
-BIN_DIR=bin/ci
-source "${ROOT_DIR}"/bin/dockerise.inc.bash
+readonly BIN_DIR=bin/ci
+readonly DOCKER_IMAGE_NAME="${DOCKER_CI_IMAGE_NAME}"
+source "${ROOT_DIR}/bin/dockerise.inc.bash"
 
 if [ ! -d "${ROOT_DIR}"/var/ci/phpcs ]; then
     mkdir -p "${ROOT_DIR}"/var/ci/phpcs

@@ -5,8 +5,10 @@ set -eu
 readonly ROOT_DIR="$(realpath "$(dirname "$(realpath "$0")")/../..")"
 source "${ROOT_DIR}"/config/docker.inc.bash
 
-readonly BIN_DIR=bin/release
-readonly DOCKER_IMAGE_NAME="${DOCKER_RELEASE_IMAGE_NAME}"
+readonly BIN_DIR=bin/symfony
+readonly DOCKER_IMAGE_NAME="${DOCKER_SYMFONY_START_IMAGE_NAME}"
 source "${ROOT_DIR}/bin/dockerise.inc.bash"
 
-php "${ROOT_DIR}"/bin/release/changelog.php "${1}"
+php bin/symfony/start.php
+
+echo "Open http://localhost:8090 in your browser to access Symfony."

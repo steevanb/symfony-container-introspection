@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+    nginx:
+        container_name: steevanb_container_introspection_nginx
+        build:
+            context: ../..
+            dockerfile: docker/symfony/nginx/Dockerfile
+        ports:
+            - "8090:80"
+        volumes:
+            - ../../var/symfony:/app
+
+    php:
+        container_name: steevanb_container_introspection_php
+        build:
+            context: ../..
+            dockerfile: docker/symfony/php/Dockerfile
+        volumes:
+            - ../../var/symfony:/app
+        depends_on:
+            - nginx

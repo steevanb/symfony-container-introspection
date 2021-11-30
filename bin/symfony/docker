@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -eu
+
+readonly ROOT_DIR="$(realpath "$(dirname "$(realpath "$0")")/../..")"
+source "${ROOT_DIR}/config/docker.inc.bash"
+
+readonly DOCKER_IMAGE_NAME="${DOCKER_SYMFONY_START_IMAGE_NAME}"
+readonly DOCKER_FILE_PATH="${ROOT_DIR}/docker/symfony/start/Dockerfile"
+source "${ROOT_DIR}/bin/docker-build.inc.bash"
+
+cd "${ROOT_DIR}/docker/symfony"
+docker-compose up --build -d

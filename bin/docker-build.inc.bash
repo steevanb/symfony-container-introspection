@@ -12,13 +12,16 @@ function buildDockerImage() {
         local refreshArguments=
     fi
 
+    readonly GROUP_DOCKER_ID=$(getent group docker | awk -F: '{printf "%d\n", $3}')
+
     DOCKER_BUILDKIT=1 \
         docker \
             build \
                 --file "${dockerFilePath}" \
                 --tag="${dockerImageName}" \
-                --build-arg DOCKER_UID="$(id -u)" \
-                --build-arg DOCKER_GID="$(id -g)" \
+                --build-arg USER_APP_ID="$(id -u)" \
+                --build-arg GROUP_APP_ID="$(id -g)" \
+                --build-arg GROUP_DOCKER_ID="${GROUP_DOCKER_ID}" \
                 ${refreshArguments} \
                 "${ROOT_DIR}"
 }

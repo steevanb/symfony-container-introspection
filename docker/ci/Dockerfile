@@ -63,4 +63,6 @@ RUN \
     && apt-get autoclean \
     && rm -rf /tmp/*
 
+ENV I_AM_A_DOCKER_CONTAINER=true
+
 WORKDIR /app
