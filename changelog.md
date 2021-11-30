@@ -1,3 +1,10 @@
+### master
+
+- [BC Break] Rename namespace `steevanb\ContainerIntrospection` to `Steevanb\ContainerIntrospection`
+- [BC Break] Move files from root directory to `src`
+- Add `bin`, `config` and `docker` directories
+- Add binaries to start the project, build Docker images, run CI tools etc
+
 ### [2.0.0](../../compare/1.1.1...2.0.0) - 2020-10-26
 
 - Modifications for Symfony 5

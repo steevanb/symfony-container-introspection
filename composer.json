@@ -1,13 +1,30 @@
 {
     "name": "steevanb/symfony-container-introspection",
-    "license": "MIT",
     "type": "lib",
     "description": "Get all Symfony Container informations you need: registered services, instanciated services etc",
-    "autoload": {
-        "psr-4": { "steevanb\\ContainerIntrospection\\": "" }
-    },
+    "license": "MIT",
     "require": {
         "php": "^7.1",
         "symfony/dependency-injection": "^5.0"
+    },
+    "require-dev": {
+        "ocramius/proxy-manager": "^2.0"
+    },
+    "config": {
+        "cache-dir": "/app/var/composer"
+    },
+    "autoload": {
+        "psr-4": {
+            "Steevanb\\ContainerIntrospection\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@rm-composer-lock"
+        ],
+        "post-update-cmd": [
+            "@rm-composer-lock"
+        ],
+        "rm-composer-lock": "rm composer.lock"
     }
 }

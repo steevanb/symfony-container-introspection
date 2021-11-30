@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle;
+namespace Steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
