@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DataCollector;
 
-use steevanb\ContainerIntrospection\ContainerIntrospectionService;
+use Steevanb\ContainerIntrospection\ContainerIntrospectionService;
 use Symfony\Component\HttpFoundation\{
     Request,
     Response
@@ -83,6 +83,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['containerCacheSize'];
     }
 
+    /** @return array<mixed> */
     public function getInstantiatedServices(): array
     {
         return $this->data['instantiatedServices'];
@@ -93,6 +94,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['countInstanciatedServices'];
     }
 
+    /** @return array<mixed> */
     public function getPublicServices(): array
     {
         return $this->data['publicServices'];
@@ -103,6 +105,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['countPublicServices'];
     }
 
+    /** @return array<mixed> */
     public function getRemovedServices(): array
     {
         return $this->data['removedServices'];
@@ -113,6 +116,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['countRemovedServices'];
     }
 
+    /** @return array<mixed> */
     public function getParameters(): array
     {
         return $this->data['parameters'];
@@ -128,6 +132,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['countServices'];
     }
 
+    /** @return array<mixed> */
     public function getInstantiatedInfos(string $id): ?array
     {
         $services = $this->getInstantiatedServices();
@@ -135,6 +140,7 @@ class ContainerIntrospectionCollector extends DataCollector
         return array_key_exists($id, $services) ? $services[$id] : null;
     }
 
+    /** @param mixed $data */
     public function dumpParameterValue($data): void
     {
         echo var_export($data, true);
