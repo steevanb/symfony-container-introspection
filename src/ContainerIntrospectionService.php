@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\{
     Container,
     Exception\ServiceNotFoundException
 };
+use Steevanb\ContainerIntrospection\Exception\ContainerIntrospectionException;
 
 class ContainerIntrospectionService
 {
@@ -22,34 +23,35 @@ class ContainerIntrospectionService
     /** @var string */
     protected $cacheDir;
 
-    /** @var string[] */
+    /** @var array<mixed> */
     protected $instanciatedServices = [];
 
-    /** @var string[] */
+    /** @var array<string> */
     protected $publicServices = [];
 
-    /** @var string[] */
-    protected $privateServices = [];
-
-    /** @var string[] */
+    /** @var array<string> */
     protected $removedServices = [];
 
+    /** @var array<mixed>  */
     protected $parameters = [];
 
-    /** @var ?string */
+    /** @var string|null */
     protected $cachePath;
 
-    /** @var ?int */
+    /** @var int|null */
     protected $cacheFilesCount;
 
-    /** @var ?int */
+    /** @var int|null */
     protected $cacheLinesCount;
 
-    /** @var ?int */
+    /** @var int|null */
     protected $cacheSize;
 
-    /** @var ?int */
+    /** @var int|null */
     protected $countServices;
+
+    /** @var bool */
+    protected $introspectHasBeenCalled = false;
 
     /**
      * Yes, Container as dependency,
@@ -59,90 +61,140 @@ class ContainerIntrospectionService
     {
         $this->container = $container;
         $this->containerClassName = get_class($container);
-        $this->cacheDir = $container->getParameter('kernel.cache_dir');
+        $cacheDir = $container->getParameter('kernel.cache_dir');
+        if (is_string($cacheDir) === false) {
+            throw new ContainerIntrospectionException('Kernel cache directory not found.');
+        }
+        $this->cacheDir = $cacheDir;
     }
 
     public function introspect(): self
     {
-        return $this
+        $this
             ->introspectInstantiatedServices()
             ->introspectPublicServices()
             ->introspectRemovedServices()
             ->introspectParameters()
             ->introspectCountServices()
             ->introspectCache();
+
+        $this->introspectHasBeenCalled = true;
+
+        return $this;
     }
 
+    /** @return array<mixed> */
     public function getInstantiatedServices(): array
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return $this->instanciatedServices;
     }
 
     public function countInstantiatedServices(): int
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return count($this->instanciatedServices);
     }
 
+    /** @return array<string> */
     public function getRemovedServices(): array
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return $this->removedServices;
     }
 
     public function countRemovedServices(): int
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return count($this->removedServices);
     }
 
+    /** @return array<string> */
     public function getPublicServices(): array
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return $this->publicServices;
     }
 
     public function countPublicServices(): int
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return count($this->publicServices);
     }
 
+    /** @return array<mixed> */
     public function getParameters(): array
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return $this->parameters;
     }
 
     public function countParameters(): int
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return count($this->parameters);
     }
 
     public function getContainerCachePath(): string
     {
-        return $this->cachePath;
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
+        return (string) $this->cachePath;
     }
 
     public function getContainerCacheDir(): string
     {
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
         return basename($this->getContainerCachePath());
     }
 
     public function countContainerCacheFiles(): int
     {
-        return $this->cacheFilesCount;
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
+        return (int) $this->cacheFilesCount;
     }
 
     public function countContainerCacheLines(): int
     {
-        return $this->cacheLinesCount;
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
+        return (int) $this->cacheLinesCount;
     }
 
     public function getContainerCacheSize(): int
     {
-        return $this->cacheSize;
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
+        return (int) $this->cacheSize;
     }
 
     public function countServices(): int
     {
-        return $this->countServices;
+        $this->assertIntrospectHasBeenCalled(__METHOD__);
+
+        return (int) $this->countServices;
     }
 
+    protected function assertIntrospectHasBeenCalled(string $method): self
+    {
+        if ($this->introspectHasBeenCalled === false) {
+            throw new ContainerIntrospectionException('You must call introspect() before ' . $method . '().');
+        }
+
+        return $this;
+    }
+
+    /** @return mixed */
     protected function getPrivatePropertyValue(string $name)
     {
         $property = new \ReflectionProperty($this->containerClassName, $name);
@@ -153,6 +205,20 @@ class ContainerIntrospectionService
         return $return;
     }
 
+    /** @return array<mixed> */
+    protected function getPrivateArrayPropertyValue(string $name): array
+    {
+        $return = $this->getPrivatePropertyValue($name);
+        if (is_array($return) === false) {
+            throw new ContainerIntrospectionException(
+                'Container property $' . $name . ' should be an array but is not.'
+            );
+        }
+
+        return $return;
+    }
+
+    /** @return class-string */
     protected function getContainerCacheClassName(): string
     {
         $reflection = new \ReflectionClass(get_class($this->container));
@@ -177,8 +243,8 @@ class ContainerIntrospectionService
     protected function introspectInstantiatedServices(): self
     {
         $services = array_merge(
-            $this->getPrivatePropertyValue('services'),
-            $this->getPrivatePropertyValue('privates')
+            $this->getPrivateArrayPropertyValue('services'),
+            $this->getPrivateArrayPropertyValue('privates')
         );
         ksort($services);
 
@@ -186,6 +252,9 @@ class ContainerIntrospectionService
             if (is_object($service)) {
                 $ocramiusLazy = $service instanceof VirtualProxyInterface;
                 $className = ($ocramiusLazy) ? get_parent_class($service) : get_class($service);
+                if (is_string($className) === false) {
+                    continue;
+                }
 
                 $reflection = new \ReflectionClass($className);
                 $constructor = $reflection->getConstructor();
@@ -242,13 +311,19 @@ class ContainerIntrospectionService
 
     protected function introspectPublicServices(): self
     {
-        $fileMapServices = array_keys($this->getPrivatePropertyValue('fileMap'));
-        $methodMapServices = array_keys($this->getPrivatePropertyValue('methodMap'));
+        $fileMapServices = array_keys($this->getPrivateArrayPropertyValue('fileMap'));
+        $methodMapServices = array_keys($this->getPrivateArrayPropertyValue('methodMap'));
         $removedServices = array_keys($this->container->getRemovedIds());
-        $privateServices = array_keys($this->getPrivatePropertyValue('privates'));
-        $services = array_keys($this->getPrivatePropertyValue('services'));
+        $privateServices = array_keys($this->getPrivateArrayPropertyValue('privates'));
+        $services = array_keys($this->getPrivateArrayPropertyValue('services'));
 
-        $this->publicServices = array_flip(array_unique(array_merge($fileMapServices, $methodMapServices, $services)));
+        /** @phpstan-ignore-next-line $publicServices (array<string>) does not accept array<int|string, int> */
+        $this->publicServices =
+            array_flip(
+                array_unique(
+                    array_merge($fileMapServices, $methodMapServices, $services)
+                )
+            );
 
         // It looks like fileMap and methodMap only registers public services, but I filter them to be sure
         foreach (array_merge($privateServices, $removedServices) as $privateServiceId) {
@@ -262,24 +337,36 @@ class ContainerIntrospectionService
 
     protected function introspectParameters(): self
     {
-        $this->parameters = $this->getPrivatePropertyValue('parameters');
+        $this->parameters = $this->getPrivateArrayPropertyValue('parameters');
 
         return $this;
     }
 
     protected function introspectCache(): self
     {
-        $this->cachePath = dirname(
-            (new \ReflectionClass($this->getContainerCacheClassName()))
-                ->getFileName()
-        );
+        $fileName = (new \ReflectionClass($this->getContainerCacheClassName()))
+            ->getFileName();
+        if (is_string($fileName) === false) {
+            throw new ContainerIntrospectionException('Container cache file name not found.');
+        }
 
-        $this->cacheFilesCount = count(glob($this->getContainerCachePath() . '/*'));
+        $this->cachePath = dirname($fileName);
+
+        $cacheFiles = glob($this->getContainerCachePath() . '/*');
+        if (is_array($cacheFiles) === false) {
+            throw new ContainerIntrospectionException('Container cache files not found.');
+        }
+        $this->cacheFilesCount = count($cacheFiles);
 
         $this->cacheLinesCount = 0;
         $this->cacheSize = 0;
-        foreach (glob($this->getContainerCachePath() . '/*') as $cacheFile) {
-            $this->cacheLinesCount += count(file(($cacheFile)));
+        foreach ($cacheFiles as $cacheFile) {
+            $lines = file($cacheFile);
+            if (is_array($lines) === false) {
+                continue;
+            }
+
+            $this->cacheLinesCount += count($lines);
             $this->cacheSize += filesize($cacheFile);
         }
 
@@ -291,11 +378,11 @@ class ContainerIntrospectionService
         $this->countServices = count(
             array_unique(
                 array_merge(
-                    array_keys($this->getPrivatePropertyValue('fileMap')),
-                    array_keys($this->getPrivatePropertyValue('methodMap')),
+                    array_keys($this->getPrivateArrayPropertyValue('fileMap')),
+                    array_keys($this->getPrivateArrayPropertyValue('methodMap')),
                     array_keys($this->container->getRemovedIds()),
-                    array_keys($this->getPrivatePropertyValue('privates')),
-                    array_keys($this->getPrivatePropertyValue('services'))
+                    array_keys($this->getPrivateArrayPropertyValue('privates')),
+                    array_keys($this->getPrivateArrayPropertyValue('services'))
                 )
             )
         );
