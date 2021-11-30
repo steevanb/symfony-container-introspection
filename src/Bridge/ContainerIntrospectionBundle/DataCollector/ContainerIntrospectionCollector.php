@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DataCollector;
+namespace Steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DataCollector;
 
 use steevanb\ContainerIntrospection\ContainerIntrospectionService;
 use Symfony\Component\HttpFoundation\{

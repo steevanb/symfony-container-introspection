@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -eu
+
+readonly rootDir="$(realpath "$(dirname "$(realpath "$0")")/../..")"
+readonly version="${1}"
+readonly logFilePath="${rootDir}/var/release"
+readonly logFilename="${logFilePath}/prepare.log"
+
+function onError() {
+    if [ -f "${logFilename}" ]; then
+        cat "${logFilename}"
+    fi
+
+    echo -e "\e[41m Error. \e[0m"
+}
+
+trap onError ERR
+
+function initLog() {
+    trap onError ERR
+
+    if [ ! -d "${logFilePath}" ]; then
+        mkdir -p "${logFilePath}"
+    fi
+
+    if [ -f "${logFilename}" ]; then
+        rm "${logFilename}"
+    fi
+}
+
+function updateReleaseBadge() {
+    trap onError ERR
+
+    echo "Edit release badge in README.md"
+
+    local badge="[![Version](https:\/\/img.shields.io\/badge\/version-${version}-4B9081.svg)](https:\/\/github.com\/steevanb\/symfony-container-introspection\/tree\/${version})"
+    sed -i "1s/.*/${badge}/" "${rootDir}"/README.md
+}
+
+function updateCodeLinesBadge() {
+    trap onError ERR
+
+    echo "Edit code lines badge in README.md"
+
+    local codeLines=
+    codeLines=$("${rootDir}"/bin/release/code-lines)
+    local badge="![Lines](https:\/\/img.shields.io\/badge\/code%20lines-${codeLines}-blue.svg)"
+    sed -i "4s/.*/${badge}/" "${rootDir}"/README.md
+}
+
+function updateComposerRequire() {
+    trap onError ERR
+
+    echo "Edit composer require in README.md"
+    local majorMinor=${version%.*}
+    sed -i "s/composer require --dev steevanb\/symfony-container-introspection ^[[:digit:]]\+.[[:digit:]]\+/composer require --dev steevanb\/symfony-container-introspection ^${majorMinor}/" README.md
+}
+
+function updateChangelog() {
+    trap onError ERR
+
+    echo "Edit changelog"
+    "${rootDir}"/bin/release/changelog "${version}"
+}
+
+initLog
+updateReleaseBadge
+updateCodeLinesBadge
+updateComposerRequire
+updateChangelog

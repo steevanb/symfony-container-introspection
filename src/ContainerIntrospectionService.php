@@ -1,19 +1,15 @@
 <?php
-/**
- * Copyright (c) 2018 Ekosport <contact@groupefraseteya.com>
- *
- * This file is part of Ekosport website.
- *
- * Ekosport website can not be copied and/or distributed without the express permission of the CIO.
- */
 
 declare(strict_types=1);
 
-namespace steevanb\ContainerIntrospection;
+namespace Steevanb\ContainerIntrospection;
 
+/** If you use https://github.com/Ocramius/ProxyManager */
 use ProxyManager\Proxy\VirtualProxyInterface;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\{
+    Container,
+    Exception\ServiceNotFoundException
+};
 
 class ContainerIntrospectionService
 {
@@ -55,7 +51,10 @@ class ContainerIntrospectionService
     /** @var ?int */
     protected $countServices;
 
-    /** Yes, Container as dependency, cause we need to use \ReflectionClass and call getRemovedIds() on it to find services */
+    /**
+     * Yes, Container as dependency,
+     * because we need to use \ReflectionClass and call getRemovedIds() on it to find services
+     */
     public function __construct(Container $container)
     {
         $this->container = $container;
@@ -65,15 +64,13 @@ class ContainerIntrospectionService
 
     public function introspect(): self
     {
-        $this
+        return $this
             ->introspectInstantiatedServices()
             ->introspectPublicServices()
             ->introspectRemovedServices()
             ->introspectParameters()
             ->introspectCountServices()
             ->introspectCache();
-
-        return $this;
     }
 
     public function getInstantiatedServices(): array
@@ -253,7 +250,7 @@ class ContainerIntrospectionService
 
         $this->publicServices = array_flip(array_unique(array_merge($fileMapServices, $methodMapServices, $services)));
 
-        // look likes fileMap and methodMap only registers public services, but i filter them to be sure
+        // It looks like fileMap and methodMap only registers public services, but I filter them to be sure
         foreach (array_merge($privateServices, $removedServices) as $privateServiceId) {
             unset($this->publicServices[$privateServiceId]);
         }

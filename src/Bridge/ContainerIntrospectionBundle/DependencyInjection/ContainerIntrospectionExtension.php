@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DependencyInjection;
+namespace Steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\{
