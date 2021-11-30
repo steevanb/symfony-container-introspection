@@ -7,7 +7,7 @@
         "psr-4": { "steevanb\\ContainerIntrospection\\": "" }
     },
     "require": {
-        "php": "^7.1",
-        "symfony/dependency-injection": "^5.0"
+        "php": "^7.1|^8.0",
+        "symfony/dependency-injection": "^5.0|^6.0"
     }
 }
