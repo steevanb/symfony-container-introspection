@@ -35,6 +35,6 @@ If you use Symfony (and not just `symfony/dependency-injection`), you can add `C
 <?php
 
 return [
-    steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\ContainerIntrospectionBundle::class => ['dev' => true]
+    Steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\ContainerIntrospectionBundle::class => ['dev' => true]
 ];
 ```
