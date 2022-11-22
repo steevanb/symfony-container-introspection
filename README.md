@@ -1,5 +1,5 @@
 [![Version](https://img.shields.io/badge/version-3.0.1-4B9081.svg)](https://github.com/steevanb/symfony-container-introspection/tree/3.0.1)
-[![php](https://img.shields.io/badge/php-^7.1-blue.svg)](https://php.net)
+[![php](https://img.shields.io/badge/php-^7.1||^8.0-blue.svg)](https://php.net)
 ![Lines](https://img.shields.io/badge/code%20lines-927-green.svg)
 ![Lines](https://img.shields.io/badge/code%20lines-1,860-blue.svg)
 
