@@ -1,5 +1,7 @@
 ### master
 
+- Fix `You must call introspect() before getContainerCachePath()`
+
 ### [3.0.0](../../compare/2.0.0...3.0.0) - 2022-11-22
 
 - [BC Break] Rename namespace `steevanb\ContainerIntrospection` to `Steevanb\ContainerIntrospection`
