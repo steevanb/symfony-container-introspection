@@ -1,0 +1,9 @@
+{
+    "config": {
+        "cache-dir": "/app/var/composer/cache",
+        "sort-packages": true,
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        }
+    }
+}

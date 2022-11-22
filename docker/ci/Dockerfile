@@ -1,11 +1,14 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-COPY --from=composer:2.1.12 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.4.4 /usr/bin/composer /usr/local/bin/composer
 
 ENV COMPOSER_HOME=/composer
+ENV COMPOSER_CACHE_DIR=/app/var/composer
 
 # To use phpstan with differents PHP versions, like php7.4 "${PHPSTAN_BIN_PATH}" ...
 ENV PHPSTAN_BIN_PATH=/usr/local/bin/phpstan
+
+COPY docker/ci/composer.json ${COMPOSER_HOME}/composer.json
 
 RUN \
     apt-get update \
@@ -22,6 +25,9 @@ RUN \
         php8.0-cli \
         php8.0-simplexml \
         php8.0-mbstring \
+        php8.1-cli \
+        php8.1-simplexml \
+        php8.1-mbstring \
         # For Composer
         curl \
         zip \
@@ -29,10 +35,8 @@ RUN \
         php7.4-zip \
         php8.0-curl \
         php8.0-zip \
-
-    # Configure Composer
-    && mkdir /composer \
-    && echo '{"config":{"cache-dir":"/app/var/composer/cache","sort-packages":true}}' > ${COMPOSER_HOME}/composer.json \
+        php8.1-curl \
+        php8.1-zip \
 
     # For php scripts in bin who will be executed with PHP 8.0
     && php7.4 /usr/local/bin/composer global require steevanb/php-parallel-processes:0.2.* \
@@ -61,6 +65,7 @@ RUN \
     && apt-get autoremove -y \
     && apt-get clean \
     && apt-get autoclean \
-    && rm -rf /tmp/*
+    && rm -rf /tmp/* \
+    && rm -rf /composer/cache
 
 WORKDIR /app
