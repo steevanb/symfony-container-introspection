@@ -352,7 +352,7 @@ class ContainerIntrospectionService
 
         $this->cachePath = dirname($fileName);
 
-        $cacheFiles = glob($this->getContainerCachePath() . '/*');
+        $cacheFiles = glob($this->cachePath . '/*');
         if (is_array($cacheFiles) === false) {
             throw new ContainerIntrospectionException('Container cache files not found.');
         }
