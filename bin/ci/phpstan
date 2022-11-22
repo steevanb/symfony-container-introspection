@@ -27,7 +27,7 @@ if [ "${clearCache}" == true ] && [ -d "${ROOT_DIR}"/var/ci/phpstan ]; then
 fi
 
 if [ "${phpVersion}" == "" ]; then
-    php8.0 "${ROOT_DIR}"/bin/ci/phpstan.php ${phpstanParameters}
+    php8.1 "${ROOT_DIR}"/bin/ci/phpstan.php ${phpstanParameters}
 else
     echo "PHP ${phpVersion}"
 
