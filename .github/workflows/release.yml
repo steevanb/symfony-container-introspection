@@ -28,7 +28,7 @@ jobs:
                 uses: peter-evans/create-pull-request@v3
                 with:
                     title: Release ${{ github.event.inputs.version }}
-                    commit-message: "[skip ci] Release ${{ github.event.inputs.version }}"
+                    commit-message: Release ${{ github.event.inputs.version }}
                     branch: release-${{ github.event.inputs.version }}
                     labels: Release
                     delete-branch: true
