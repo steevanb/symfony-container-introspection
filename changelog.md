@@ -4,6 +4,7 @@
 - [BC Break] Move files from root directory to `src`
 - Add `bin`, `config` and `docker` directories
 - Add binaries to start the project, build Docker images, run CI tools etc
+- Add PHP 8.0 and 8.1 compatibility
 
 ### [2.0.0](../../compare/1.1.1...2.0.0) - 2020-10-26
 
