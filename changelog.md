@@ -1,5 +1,7 @@
 ### master
 
+### [3.1.0](../../compare/3.0.1...3.1.0) - 2024-08-28
+
 - Add `Symfony ^7.0` compatibility
 - Add `PHP 8.2` and `8.3` compatibility
 - Update CI tools
