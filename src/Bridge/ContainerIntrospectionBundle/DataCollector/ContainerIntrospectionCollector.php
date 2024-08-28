@@ -132,9 +132,10 @@ class ContainerIntrospectionCollector extends DataCollector
         return $this->data['countServices'];
     }
 
-    /** @return array<mixed> */
+    /** @return array<mixed>|null */
     public function getInstantiatedInfos(string $id): ?array
     {
+        /** @var array<array<mixed>> $services */
         $services = $this->getInstantiatedServices();
 
         return array_key_exists($id, $services) ? $services[$id] : null;

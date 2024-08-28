@@ -1,16 +1,16 @@
 {
     "name": "steevanb/symfony-container-introspection",
-    "type": "lib",
     "description": "Get all Symfony Container informations you need: registered services, instanciated services etc",
     "license": "MIT",
+    "type": "lib",
     "require": {
         "php": "^7.1 || ^8.0",
-        "symfony/dependency-injection": "^5.0 || ^6.0"
+        "symfony/dependency-injection": "^5.0 || ^6.0 || ^7.0"
     },
     "require-dev": {
         "ocramius/proxy-manager": "^2.0",
-        "symfony/config": "^5.0 || ^6.0",
-        "symfony/http-kernel": "^5.0 || ^6.0"
+        "symfony/config": "~5.0.0",
+        "symfony/http-kernel": "~5.0.0"
     },
     "autoload": {
         "psr-4": {

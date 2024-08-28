@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Steevanb\ContainerIntrospection\Bridge\ContainerIntrospectionBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\HttpKernel\{
+    DependencyInjection\Extension
+};
 use Symfony\Component\DependencyInjection\{
     ContainerBuilder,
     Loader\YamlFileLoader
 };
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class ContainerIntrospectionExtension extends Extension
 {

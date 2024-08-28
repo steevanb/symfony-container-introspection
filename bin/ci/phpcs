@@ -12,13 +12,4 @@ if [ ! -d "${ROOT_DIR}"/var/ci/phpcs ]; then
     mkdir -p "${ROOT_DIR}"/var/ci/phpcs
 fi
 
-phpcs \
-    -p \
-    --warning-severity=0 \
-    --ignore=/vendor/,/var/,src/Doctrine/ORM/EntityManager.php \
-    --bootstrap=config/ci/phpcs.php \
-    --standard="${COMPOSER_HOME}"/vendor/steevanb/php-code-sniffs/src/Steevanb/ruleset.xml \
-    --report=steevanb\\PhpCodeSniffs\\Reports\\Steevanb \
-    --cache="${ROOT_DIR}"/var/ci/phpcs/cache \
-    . \
-    "${@}"
+phpcs -p --standard="${ROOT_DIR}"/config/ci/phpcs.xml "${@}"
