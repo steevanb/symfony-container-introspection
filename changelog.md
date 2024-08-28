@@ -1,5 +1,9 @@
 ### master
 
+- Add `Symfony ^7.0` compatibility
+- Add `PHP 8.2` and `8.3` compatibility
+- Update CI tools
+
 ### [3.0.1](../../compare/3.0.0...3.0.1) - 2022-11-22
 
 - Fix `You must call introspect() before getContainerCachePath()`
@@ -10,7 +14,7 @@
 - [BC Break] Move files from root directory to `src`
 - Add `bin`, `config` and `docker` directories
 - Add binaries to start the project, build Docker images, run CI tools etc
-- Add PHP 8.0 and 8.1 compatibility
+- Add `PHP ^8.0` compatibility
 
 ### [2.0.0](../../compare/1.1.1...2.0.0) - 2020-10-26
 

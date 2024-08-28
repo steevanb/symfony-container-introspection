@@ -1,6 +1,6 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
-COPY --from=composer:2.4.4 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.7.8 /usr/bin/composer /usr/local/bin/composer
 
 ENV COMPOSER_HOME=/composer
 ENV COMPOSER_CACHE_DIR=/app/var/composer
@@ -28,6 +28,12 @@ RUN \
         php8.1-cli \
         php8.1-simplexml \
         php8.1-mbstring \
+        php8.2-cli \
+        php8.2-simplexml \
+        php8.2-mbstring \
+        php8.3-cli \
+        php8.3-simplexml \
+        php8.3-mbstring \
         # For Composer
         curl \
         zip \
@@ -37,23 +43,27 @@ RUN \
         php8.0-zip \
         php8.1-curl \
         php8.1-zip \
+        php8.2-curl \
+        php8.2-zip \
+        php8.3-curl \
+        php8.3-zip \
 
     # For php scripts in bin who will be executed with PHP 8.0
     && php7.4 /usr/local/bin/composer global require steevanb/php-parallel-processes:0.2.* \
 
     # Install CI tools
     && php7.4 /usr/local/bin/composer global require \
-        maglnet/composer-require-checker:3.5.* \
+        maglnet/composer-require-checker:3.8.* \
         wapmorgan/php-deprecation-detector:2.0.* \
-        steevanb/php-code-sniffs:4.2.* \
-        phpstan/phpstan:1.1.* \
-        phpstan/phpstan-deprecation-rules:1.0.* \
-        phpstan/phpstan-strict-rules:1.0. \
-        phpstan/phpstan-phpunit:1.0.* \
-        spaze/phpstan-disallowed-calls:2.0.* \
+        steevanb/php-code-sniffs:5.0.* \
+        phpstan/phpstan:1.12.* \
+        phpstan/phpstan-deprecation-rules:1.2.* \
+        phpstan/phpstan-strict-rules:1.6.* \
+        phpstan/phpstan-phpunit:1.4.* \
+        spaze/phpstan-disallowed-calls:3.4.* \
         ergebnis/phpstan-rules:1.0.* \
-        insolita/unused-scanner:2.3.* \
-        ergebnis/composer-normalize:2.15.* \
+        insolita/unused-scanner:2.4.* \
+        ergebnis/composer-normalize:2.43.* \
     && ln -s ${COMPOSER_HOME}/vendor/bin/composer-require-checker /usr/local/bin/composer-require-checker \
     && ln -s ${COMPOSER_HOME}/vendor/bin/phpdd /usr/local/bin/phpdd \
     && ln -s ${COMPOSER_HOME}/vendor/bin/phpcs /usr/local/bin/phpcs \

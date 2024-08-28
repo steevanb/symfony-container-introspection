@@ -317,13 +317,13 @@ class ContainerIntrospectionService
         $privateServices = array_keys($this->getPrivateArrayPropertyValue('privates'));
         $services = array_keys($this->getPrivateArrayPropertyValue('services'));
 
-        /** @phpstan-ignore-next-line $publicServices (array<string>) does not accept array<int|string, int> */
-        $this->publicServices =
-            array_flip(
-                array_unique(
-                    array_merge($fileMapServices, $methodMapServices, $services)
-                )
-            );
+        /** @var array<string> $publicServices */
+        $publicServices = array_flip(
+            array_unique(
+                array_merge($fileMapServices, $methodMapServices, $services)
+            )
+        );
+        $this->publicServices = $publicServices;
 
         // It looks like fileMap and methodMap only registers public services, but I filter them to be sure
         foreach (array_merge($privateServices, $removedServices) as $privateServiceId) {

@@ -8,7 +8,7 @@ symfony-container-introspection
 
 It helps you to know which services are instanciated, removed, public and list container parameters.
 
-You have access to Container cache statistics: files count, count code lines and cache size.
+You have access to Container cache statistics: files count, code lines count and cache size.
 
 With Symfony, a new profiler tab will appear:
 

@@ -4,6 +4,7 @@ parameters:
         - ../../src
 includes:
     - /composer/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - /composer/vendor/phpstan/phpstan-phpunit/extension.neon
     - /composer/vendor/phpstan/phpstan-phpunit/rules.neon
     - /composer/vendor/phpstan/phpstan-strict-rules/rules.neon
     - /composer/vendor/spaze/phpstan-disallowed-calls/extension.neon
