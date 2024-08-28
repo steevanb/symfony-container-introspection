@@ -1,7 +1,7 @@
-[![Version](https://img.shields.io/badge/version-3.0.1-4B9081.svg)](https://github.com/steevanb/symfony-container-introspection/tree/3.0.1)
+[![Version](https://img.shields.io/badge/version-3.1.0-4B9081.svg)](https://github.com/steevanb/symfony-container-introspection/tree/3.1.0)
 [![php](https://img.shields.io/badge/php-^7.1||^8.0-blue.svg)](https://php.net)
 ![Lines](https://img.shields.io/badge/code%20lines-927-green.svg)
-![Lines](https://img.shields.io/badge/code%20lines-1,860-blue.svg)
+![Lines](https://img.shields.io/badge/code%20lines-1,892-blue.svg)
 
 symfony-container-introspection
 ===============================
@@ -26,7 +26,7 @@ Installation
 ============
 
 ```bash
-composer require --dev steevanb/symfony-container-introspection ^3.0
+composer require --dev steevanb/symfony-container-introspection ^3.1
 ```
 
 If you use Symfony (and not just `symfony/dependency-injection`), you can add `ContainerIntrospectionBundle` to your Kernel:
