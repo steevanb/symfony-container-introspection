@@ -46,7 +46,7 @@ function updateCodeLinesBadge() {
     local codeLines=
     codeLines=$("${rootDir}"/bin/release/code-lines)
     local badge="![Lines](https:\/\/img.shields.io\/badge\/code%20lines-${codeLines}-blue.svg)"
-    sed -i "4s/.*/${badge}/" "${rootDir}"/README.md
+    sed -i "3s/.*/${badge}/" "${rootDir}"/README.md
 }
 
 function updateComposerRequire() {
