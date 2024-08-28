@@ -33,11 +33,17 @@ jobs:
                     labels: Release
                     delete-branch: true
             -
+                name: Approve pull request
+                uses: juliangruber/approve-pull-request-action@v2
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+            -
                 name: Merge pull request
                 uses: juliangruber/merge-pull-request-action@v1
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
-                    number: ${{ steps.create-pull-request.outputs.pull-request-number }}"
+                    number: ${{ steps.create-pull-request.outputs.pull-request-number }}
                     method: rebase
             -
                 name: Create release
